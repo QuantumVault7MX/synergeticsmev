@@ -15,10 +15,22 @@ export default function App() {
   const [isClaimOpen, setIsClaimOpen] = useState<boolean>(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState<boolean>(false);
   const [activeOnlineUsers, setActiveOnlineUsers] = useState<number>(1284);
+  const [isAdmin, setIsAdmin] = useState<boolean>(false);
 
   useEffect(() => {
     // Extract and save click_id from URL query params (e.g., ?click_id=xyz123)
     extractAndStoreClickId(config.richAdsParamName);
+
+    // Secret Admin Gate: Only show settings icon if ?admin=true is present in the URL
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('admin') === 'true' || sessionStorage.getItem('isAdmin') === 'true') {
+      setIsAdmin(true);
+      try {
+        sessionStorage.setItem('isAdmin', 'true');
+      } catch {
+        // Ignore storage restrictions
+      }
+    }
   }, [config.richAdsParamName]);
 
   const handleScrollToProof = () => {
@@ -33,7 +45,7 @@ export default function App() {
       {/* Top Navbar */}
       <Navbar
         onOpenClaim={() => setIsClaimOpen(true)}
-        onOpenSettings={() => setIsSettingsOpen(true)}
+        onOpenSettings={isAdmin ? () => setIsSettingsOpen(true) : undefined}
         activeOnlineUsers={activeOnlineUsers}
       />
 

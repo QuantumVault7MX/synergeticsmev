@@ -1,5 +1,5 @@
 import React from 'react';
-import { Users } from 'lucide-react';
+import { Users, Settings } from 'lucide-react';
 import synergeticsLogo from '../assets/images/synergetics_logo_1785323781074.jpg';
 
 interface NavbarProps {
@@ -8,7 +8,7 @@ interface NavbarProps {
   activeOnlineUsers: number;
 }
 
-export const Navbar: React.FC<NavbarProps> = ({ activeOnlineUsers }) => {
+export const Navbar: React.FC<NavbarProps> = ({ activeOnlineUsers, onOpenSettings }) => {
   return (
     <nav className="sticky top-0 z-40 backdrop-blur-md bg-slate-900/90 border-b border-slate-800/80 transition-all">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
@@ -32,7 +32,7 @@ export const Navbar: React.FC<NavbarProps> = ({ activeOnlineUsers }) => {
           </div>
         </div>
 
-        {/* Live counter */}
+        {/* Live counter & Settings */}
         <div className="flex items-center gap-3 sm:gap-4">
           <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-800/60 border border-slate-700/50 text-xs text-slate-300">
             <span className="relative flex h-2 w-2">
@@ -42,6 +42,16 @@ export const Navbar: React.FC<NavbarProps> = ({ activeOnlineUsers }) => {
             <Users className="w-3.5 h-3.5 text-slate-400" />
             <span><strong className="text-white">{activeOnlineUsers}</strong> Ahli Menyertai</span>
           </div>
+
+          {onOpenSettings && (
+            <button
+              onClick={onOpenSettings}
+              className="p-2 rounded-xl bg-slate-800/60 hover:bg-slate-700 border border-slate-700/50 text-slate-400 hover:text-white transition-colors cursor-pointer"
+              title="Tetapan Postback"
+            >
+              <Settings className="w-4.5 h-4.5" />
+            </button>
+          )}
         </div>
       </div>
     </nav>
