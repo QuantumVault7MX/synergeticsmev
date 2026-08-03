@@ -1,0 +1,6 @@
+{
+  "name": "Starter Bonus Landing Page",
+  "description": "Claim $50 + $50 starter bonus with 100% risk-free guarantee, live payout proof, video testimonials, and community group access.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
