@@ -127,7 +127,30 @@ export async function sendRichAdsPostback(
   console.log(`[RichAds Postback] Sending postback for event "${event}" with click_id "${clickId}":`, targetUrl);
 
   try {
-    // 1. Try Beacon API (most reliable for outgoing navigation events)
+    // 1. Try Serverless Proxy on the same domain (to bypass ad blockers)
+    if (typeof window !== 'undefined' && window.location) {
+      try {
+        const proxyUrl = `${window.location.origin}/api/postback`;
+        const response = await fetch(proxyUrl, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ url: targetUrl }),
+        });
+        if (response.ok) {
+          const data = await response.json();
+          if (data.success) {
+            console.log('[RichAds Postback] Successfully sent postback via Serverless Proxy:', targetUrl);
+            return { success: true, url: targetUrl, clickId, event, timestamp };
+          }
+        }
+      } catch (proxyErr) {
+        console.warn('[RichAds Postback] Serverless proxy postback failed, falling back to client-side:', proxyErr);
+      }
+    }
+
+    // 2. Client-Side Fallback: Try Beacon API (most reliable for outgoing navigation events)
     if (typeof navigator !== 'undefined' && navigator.sendBeacon) {
       const beaconSent = navigator.sendBeacon(targetUrl);
       if (beaconSent) {
@@ -135,7 +158,7 @@ export async function sendRichAdsPostback(
       }
     }
 
-    // 2. Try Fetch (no-cors mode to bypass ad network CORS restriction)
+    // 3. Client-Side Fallback: Try Fetch (no-cors mode to bypass ad network CORS restriction)
     await fetch(targetUrl, {
       method: 'GET',
       mode: 'no-cors',
@@ -144,7 +167,7 @@ export async function sendRichAdsPostback(
 
     return { success: true, url: targetUrl, clickId, event, timestamp };
   } catch (err: any) {
-    // 3. Fallback: Image Beacon (works in almost all browsers)
+    // 4. Client-Side Fallback: Image Beacon (works in almost all browsers)
     try {
       if (typeof window !== 'undefined') {
         const img = new Image();
@@ -152,7 +175,7 @@ export async function sendRichAdsPostback(
       }
       return { success: true, url: targetUrl, clickId, event, timestamp };
     } catch (imgErr: any) {
-      console.error('[RichAds Postback] Failed to trigger postback:', imgErr);
+      console.error('[RichAds Postback] Failed to trigger client postback fallback:', imgErr);
       return {
         success: false,
         url: targetUrl,

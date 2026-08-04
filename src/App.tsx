@@ -11,7 +11,14 @@ import { AppConfig } from './types';
 import { extractAndStoreClickId } from './utils/richAdsTracking';
 
 export default function App() {
-  const [config, setConfig] = useState<AppConfig>(defaultConfig);
+  const [config, setConfig] = useState<AppConfig>(() => {
+    try {
+      const saved = localStorage.getItem('app_config');
+      return saved ? JSON.parse(saved) : defaultConfig;
+    } catch {
+      return defaultConfig;
+    }
+  });
   const [isClaimOpen, setIsClaimOpen] = useState<boolean>(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState<boolean>(false);
   const [activeOnlineUsers, setActiveOnlineUsers] = useState<number>(1284);
@@ -32,6 +39,15 @@ export default function App() {
       }
     }
   }, [config.richAdsParamName]);
+
+  const handleSaveConfig = (newConfig: AppConfig) => {
+    setConfig(newConfig);
+    try {
+      localStorage.setItem('app_config', JSON.stringify(newConfig));
+    } catch {
+      // Ignore storage restrictions
+    }
+  };
 
   const handleScrollToProof = () => {
     const el = document.getElementById('video-proof-section');
@@ -90,7 +106,7 @@ export default function App() {
         isOpen={isSettingsOpen}
         onClose={() => setIsSettingsOpen(false)}
         config={config}
-        onSaveConfig={(newConfig) => setConfig(newConfig)}
+        onSaveConfig={handleSaveConfig}
       />
     </div>
   );
