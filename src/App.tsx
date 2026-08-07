@@ -1,9 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { Navbar } from './components/Navbar';
 import { Hero } from './components/Hero';
+import { OfflineEventSection } from './components/OfflineEventSection';
+import { LeaderEventsSection } from './components/LeaderEventsSection';
 import { VideoSection } from './components/VideoSection';
 import { LiveFeed } from './components/LiveFeed';
 import { CtaSection } from './components/CtaSection';
+import { Footer } from './components/Footer';
 import { ClaimModal } from './components/ClaimModal';
 import { SettingsModal } from './components/SettingsModal';
 import { defaultConfig } from './data/mockData';
@@ -74,6 +77,12 @@ export default function App() {
           onScrollToProof={handleScrollToProof}
         />
 
+        {/* May Offline Event Section */}
+        <OfflineEventSection />
+
+        {/* Leader Offline Activities Section */}
+        <LeaderEventsSection />
+
         {/* Video Testimonials Section */}
         <VideoSection
           config={config}
@@ -92,6 +101,9 @@ export default function App() {
           onOpenClaim={() => setIsClaimOpen(true)}
           onScrollToProof={handleScrollToProof}
         />
+
+        {/* Social Media Footer Section */}
+        <Footer />
       </main>
 
       {/* Claim Modal */}

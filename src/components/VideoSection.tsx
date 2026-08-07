@@ -1,14 +1,98 @@
-import React from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Trophy } from 'lucide-react';
+import defaultMemberVideo from '../assets/vid2.mp4';
 import { AppConfig } from '../types';
-import memberVideo from '../assets/vid.mp4';
 
 interface VideoSectionProps {
   config: AppConfig;
   onOpenClaim?: () => void;
 }
 
+// Simple IndexedDB helper for saving uploaded video blob
+const DB_NAME = 'SynergeticsVideoDB';
+const STORE_NAME = 'videos';
+
+const saveVideoToDB = (file: File) => {
+  return new Promise<void>((resolve, reject) => {
+    const request = indexedDB.open(DB_NAME, 1);
+    request.onupgradeneeded = () => {
+      request.result.createObjectStore(STORE_NAME);
+    };
+    request.onsuccess = () => {
+      const db = request.result;
+      const tx = db.transaction(STORE_NAME, 'readwrite');
+      tx.objectStore(STORE_NAME).put(file, 'memberVideo');
+      tx.oncomplete = () => resolve();
+      tx.onerror = () => reject(tx.error);
+    };
+    request.onerror = () => reject(request.error);
+  });
+};
+
+const getVideoFromDB = (): Promise<Blob | null> => {
+  return new Promise((resolve) => {
+    const request = indexedDB.open(DB_NAME, 1);
+    request.onupgradeneeded = () => {
+      request.result.createObjectStore(STORE_NAME);
+    };
+    request.onsuccess = () => {
+      const db = request.result;
+      if (!db.objectStoreNames.contains(STORE_NAME)) {
+        return resolve(null);
+      }
+      const tx = db.transaction(STORE_NAME, 'readonly');
+      const getReq = tx.objectStore(STORE_NAME).get('memberVideo');
+      getReq.onsuccess = () => resolve(getReq.result || null);
+      getReq.onerror = () => resolve(null);
+    };
+    request.onerror = () => resolve(null);
+  });
+};
+
+const deleteVideoFromDB = () => {
+  return new Promise<void>((resolve) => {
+    const request = indexedDB.open(DB_NAME, 1);
+    request.onsuccess = () => {
+      const db = request.result;
+      if (db.objectStoreNames.contains(STORE_NAME)) {
+        const tx = db.transaction(STORE_NAME, 'readwrite');
+        tx.objectStore(STORE_NAME).delete('memberVideo');
+        tx.oncomplete = () => resolve();
+      } else {
+        resolve();
+      }
+    };
+    request.onerror = () => resolve();
+  });
+};
+
 export const VideoSection: React.FC<VideoSectionProps> = () => {
+  const [videoUrl, setVideoUrl] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+
+  // Load saved video from IndexedDB on initial mount
+  useEffect(() => {
+    getVideoFromDB().then((blob) => {
+      if (blob) {
+        const url = URL.createObjectURL(blob);
+        setVideoUrl(url);
+      }
+    });
+  }, []);
+
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (videoUrl) {
+        URL.revokeObjectURL(videoUrl);
+      }
+      const newUrl = URL.createObjectURL(file);
+      setVideoUrl(newUrl);
+      await saveVideoToDB(file);
+    }
+  };
+
+
   return (
     <section id="video-proof-section" className="bg-slate-800/80 border border-slate-700/80 rounded-2xl p-5 sm:p-8 text-center mb-12 shadow-xl relative overflow-hidden backdrop-blur-sm scroll-mt-20">
       {/* Background Accent glow */}
@@ -29,16 +113,25 @@ export const VideoSection: React.FC<VideoSectionProps> = () => {
 
         {/* Video Player Container */}
         <div className="relative rounded-xl overflow-hidden border border-slate-700 bg-black shadow-2xl group">
+          <input
+            type="file"
+            ref={fileInputRef}
+            onChange={handleFileUpload}
+            accept="video/*"
+            className="hidden"
+          />
           <div className="relative aspect-video w-full flex items-center justify-center bg-slate-950">
             <video
-              src={memberVideo}
+              src={videoUrl || defaultMemberVideo}
               controls
-              preload="metadata"
+              autoPlay={false}
               playsInline
               className="w-full h-full object-contain"
             />
           </div>
         </div>
+
+
       </div>
     </section>
   );

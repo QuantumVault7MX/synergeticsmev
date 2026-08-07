@@ -40,9 +40,16 @@ export const Hero: React.FC<HeroProps> = ({ config }) => {
       </div>
 
       {/* Main Title */}
-      <h1 className="text-3xl sm:text-5xl md:text-6xl font-black text-white tracking-tight leading-tight mb-4">
+      <h1 className="text-3xl sm:text-5xl md:text-6xl font-black text-white tracking-tight leading-tight mb-3">
         Deposit <span className="bg-gradient-to-r from-purple-400 via-fuchsia-300 to-violet-400 bg-clip-text text-transparent font-extrabold">RM{config.bonusAmountPrimary} + RM{config.bonusAmountMatch} Bonus</span>
       </h1>
+
+      {/* Subheadline with highlighted 7% */}
+      <div className="inline-block bg-gradient-to-r from-amber-500/15 via-yellow-500/20 to-amber-500/15 border border-amber-400/30 px-4 py-2 rounded-xl mb-4 backdrop-blur-sm shadow-lg shadow-amber-500/10">
+        <p className="text-base sm:text-xl font-bold text-amber-200">
+          Hari-hari pulangan sehingga <span className="text-amber-300 font-black text-lg sm:text-2xl px-2.5 py-0.5 bg-amber-400/25 border border-amber-400/60 rounded-lg shadow-inner inline-block mx-1 drop-shadow-[0_0_10px_rgba(251,191,36,0.6)]">7%</span>
+        </p>
+      </div>
 
       {/* Subtitle */}
       <p className="text-base sm:text-xl text-slate-300 max-w-2xl mx-auto mb-8 font-normal leading-relaxed">

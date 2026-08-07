@@ -20,6 +20,7 @@ export const ClaimModal: React.FC<ClaimModalProps> = ({ isOpen, onClose, config 
   const handleCopyCode = () => {
     navigator.clipboard.writeText(claimCode);
     setCopied(true);
+    // Fire RichAds 'lead' postback when user copies code
     sendRichAdsPostback(config, 'lead');
     setTimeout(() => setCopied(false), 2000);
   };
@@ -64,7 +65,10 @@ export const ClaimModal: React.FC<ClaimModalProps> = ({ isOpen, onClose, config 
           <h3 className="text-2xl font-black text-white tracking-tight">
             Deposit RM{config.bonusAmountPrimary} + RM{config.bonusAmountMatch} Bonus
           </h3>
-          <p className="text-xs text-slate-400 mt-1">
+          <p className="text-sm font-bold text-amber-300 mt-1.5 inline-block bg-amber-500/15 border border-amber-400/30 px-3 py-1 rounded-lg">
+            Hari-hari pulangan sehingga <span className="text-amber-300 font-black text-base px-1.5 py-0.5 bg-amber-400/25 border border-amber-400/50 rounded shadow-inner ml-0.5">7%</span>
+          </p>
+          <p className="text-xs text-slate-400 mt-2">
             Pas Permulaan 100% Bebas Risiko • Pengaktifan Serta-Merta
           </p>
         </div>
