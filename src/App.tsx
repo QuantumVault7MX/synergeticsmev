@@ -12,6 +12,7 @@ import { SettingsModal } from './components/SettingsModal';
 import { defaultConfig } from './data/mockData';
 import { AppConfig } from './types';
 import { extractAndStoreClickId } from './utils/richAdsTracking';
+import { LiquidEther } from './components/LiquidEther';
 
 export default function App() {
   const [config, setConfig] = useState<AppConfig>(() => {
@@ -60,7 +61,29 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 font-sans antialiased selection:bg-cyan-500 selection:text-slate-950 pb-12">
+    <div className="min-h-screen bg-slate-950 text-slate-100 font-sans antialiased selection:bg-cyan-500 selection:text-slate-950 pb-12 relative overflow-x-hidden">
+      {/* Interactive Liquid Background */}
+      <div className="fixed inset-0 pointer-events-none z-0 opacity-30">
+        <LiquidEther
+          colors={['#5227FF', '#FF9FFC', '#B497CF']}
+          mouseForce={25}
+          cursorSize={120}
+          isViscous={false}
+          viscous={30}
+          iterationsViscous={32}
+          iterationsPoisson={32}
+          resolution={0.4}
+          isBounce={false}
+          autoDemo={true}
+          autoSpeed={0.4}
+          autoIntensity={2.0}
+          takeoverDuration={0.25}
+          autoResumeDelay={2000}
+          autoRampDuration={0.6}
+        />
+      </div>
+
+      <div className="relative z-10">
       {/* Top Navbar */}
       <Navbar
         onOpenClaim={() => setIsClaimOpen(true)}
@@ -120,6 +143,7 @@ export default function App() {
         config={config}
         onSaveConfig={handleSaveConfig}
       />
+      </div>
     </div>
   );
 }
